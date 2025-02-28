@@ -1,4 +1,4 @@
-package ru.itmo.meow.managers;
+package ru.itmo.meow.managers; //privet
 
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicLong; //это потокобезопасный счетчик чисел типа long. Он используется, когда нужно автоматически увеличивать число без проблем с многопоточностью
