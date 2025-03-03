@@ -1,4 +1,4 @@
 package ru.itmo.meow.commands;
 
-public class show {
+public class remove_key_null {
 }

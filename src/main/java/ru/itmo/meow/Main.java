@@ -1,6 +1,6 @@
 package ru.itmo.meow;
 
-import ru.itmo.meow.managers.ProductManager;
+import ru.itmo.meow.manager.ProductManager;
 import ru.itmo.meow.commands.CommandExecutor;
 import java.util.Scanner;
 

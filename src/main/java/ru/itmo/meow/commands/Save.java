@@ -1,4 +1,4 @@
 package ru.itmo.meow.commands;
 
-public class help {
+public class save {
 }
