@@ -70,4 +70,10 @@ public class ProductManager {
         products.clear();
         System.out.println("Коллекция очищена.");
     }
+
+    public void addProductWithKey(Long id, Product product) {
+        products.put(id, product);
+        System.out.println("Продукт добавлен с id: " + id);
+    }
+
 }
