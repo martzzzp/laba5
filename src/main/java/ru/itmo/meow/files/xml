@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<CollectionManager><collection><Product><id>1</id><name>Молоко</name><coordinates><x>15</x><y>25</y></coordinates><price>150</price><partNumber>A9876</partNumber><manufactureCost>50</manufactureCost><unitOfMeasure>LITERS</unitOfMeasure><owner><name>Иван Иванов</name><passportID>1234567890</passportID></owner></Product></collection></CollectionManager>

@@ -76,9 +76,6 @@ public class ProductManager {
         System.out.println("Продукт добавлен с id: " + id);
     }
 
-    public void removeProduct(Long id) {
-        products.remove(id);
-    }
 
 
 }
