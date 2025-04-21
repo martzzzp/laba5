@@ -1,27 +1,24 @@
 package org.example.command;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-import java.util.Objects;
-
 /**
- * Абстрактный класс для всех команд
+ * Базовый класс для команд — хранит имя и описание.
  */
-@AllArgsConstructor
-@Getter
 public abstract class Command implements CommandInterface {
-    private String name;
-    private String description;
+    private final String name;
+    private final String description;
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, description);
+    protected Command(String name, String description) {
+        this.name = name;
+        this.description = description;
     }
 
     @Override
-    public String toString() {
-        return String.format("- %-40s  %s", name, description);
+    public String getName() {
+        return name;
     }
 
+    /** Если у вас есть метод getDescription(), оставьте его на месте */
+    public String getDescription() {
+        return description;
+    }
 }

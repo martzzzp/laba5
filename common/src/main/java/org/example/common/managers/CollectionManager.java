@@ -1,4 +1,4 @@
-package org.example.managers;
+package org.example.common.managers;
 
 import lombok.Getter;
 import org.example.entity.Product;

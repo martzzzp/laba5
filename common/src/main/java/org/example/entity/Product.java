@@ -2,7 +2,7 @@ package org.example.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.example.managers.CollectionManager;
+import org.example.common.managers.CollectionManager;
 import org.example.utils.Validatable;
 
 import java.text.SimpleDateFormat;
