@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
+
+    <!-- Наследуем groupId, version и packaging=pom из корневого -->
     <parent>
         <groupId>org.example</groupId>
         <artifactId>lab5_prog</artifactId>
@@ -10,13 +14,47 @@
     </parent>
 
     <artifactId>common</artifactId>
-    <dependencies>
-        <!-- сюда позже добавим JSON‑библиотеку (Gson/Jackson), JAXB и т.д. -->
-    </dependencies>
+    <packaging>jar</packaging>
+
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+        <!-- Здесь можно добавить JSON-библиотеку, если будете сериализовать в common -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.26</version>  <!-- или последнюю доступную -->
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Комpилятор с включённой обработкой аннотаций -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.12.1</version>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.26</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <release>17</release>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

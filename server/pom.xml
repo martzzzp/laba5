@@ -3,6 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>org.example</groupId>
         <artifactId>lab5_prog</artifactId>
@@ -10,27 +11,49 @@
     </parent>
 
     <artifactId>server</artifactId>
+    <packaging>jar</packaging>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
 
     <dependencies>
-        <!-- Общий код из common -->
+        <!-- общие классы -->
         <dependency>
             <groupId>org.example</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- JSON‑библиотека для сериализации -->
+        <!-- gson -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.8.9</version>
         </dependency>
-
     </dependencies>
 
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
+    <build>
+        <plugins>
+            <!-- здесь именно plugins, а не pluginManagement -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.4.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>shade</goal></goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>org.example.server.ServerMain</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
