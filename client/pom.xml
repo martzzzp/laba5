@@ -1,11 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- Наследуем groupId и version из корневого POM -->
     <parent>
         <groupId>org.example</groupId>
         <artifactId>lab5_prog</artifactId>
@@ -14,19 +12,29 @@
     <artifactId>client</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+
     <dependencies>
-        <!-- ссылка на common -->
+        <!-- Общий модуль с DTO и протоколом -->
         <dependency>
             <groupId>org.example</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- gson и т.п. -->
+        <!-- GSON для JSON -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.9</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Shade для клиента -->
+            <!-- Собираем fat-jar с Main-классом -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -41,13 +49,11 @@
                                     <mainClass>org.example.client.ClientMain</mainClass>
                                 </transformer>
                             </transformers>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- Компилятор Java 17 -->
+            <!-- Компилятор под Java 17 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

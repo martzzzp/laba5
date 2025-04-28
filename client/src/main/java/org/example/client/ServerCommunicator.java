@@ -10,23 +10,21 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 
-public class ServerCommunicator { //Отправляет JSON-запрос и ждёт JSON-ответ. Здесь мы используем GSON и блокирующий канал
+/** Отправляет JSON-запрос и ждёт JSON-ответ. */
+public class ServerCommunicator {
     private final SocketChannel channel;
     private final Gson gson = new Gson();
 
     public ServerCommunicator(String host, int port) throws IOException {
-        channel = SocketChannel.open(new InetSocketAddress(host, port));
-        channel.configureBlocking(true);
+        this.channel = SocketChannel.open(new InetSocketAddress(host, port));
+        this.channel.configureBlocking(true);
     }
 
-    /** Отправляет Request и возвращает распарсенный Response. */
     public Response send(Request req) throws IOException {
         String jsonReq = gson.toJson(req) + "\n";
-        ByteBuffer out = ByteBuffer.wrap(jsonReq.getBytes(StandardCharsets.UTF_8));
-        channel.write(out);
+        channel.write(ByteBuffer.wrap(jsonReq.getBytes(StandardCharsets.UTF_8)));
 
-        // прочитать всю строку-ответ (до \n)
-        ByteBuffer in = ByteBuffer.allocate(8192);
+        ByteBuffer in = ByteBuffer.allocate(8 * 1024);
         int read = channel.read(in);
         if (read < 0) throw new IOException("Connection closed by server");
         in.flip();
@@ -38,4 +36,3 @@ public class ServerCommunicator { //Отправляет JSON-запрос и ж
         channel.close();
     }
 }
-
