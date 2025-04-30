@@ -18,16 +18,17 @@ public class CommandProcessor {
 
     public Response process(Request req) {
         try {
-            // получаем реализацию команды по её имени
+            // 1) найдём объект-команду по её имени
             CommandInterface cmd = commandManager.get(req.getCommandName());
-            // готовим аргументы
+            // 2) подготовим аргументы и payload
             String[] args = req.getArgs().toArray(new String[0]);
-            // исполняем команду (void execute)
-            cmd.execute(args);
-            // возвращаем успешный ответ без payload
-            return new Response(true, null, null);
+            Object payload = req.getPayload(); // может быть null
+            // 3) выполним команду и получим результат
+            Object result = cmd.execute(args, payload);
+            // 4) вернём Response с result
+            return new Response(/*ok=*/true, /*result=*/result, /*error=*/null);
         } catch (Exception e) {
-            // в случае ошибки – возвращаем текст ошибки
+            // при любой ошибке – вернём её текст
             return new Response(false, null, e.getMessage());
         }
     }

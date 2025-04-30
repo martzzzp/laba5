@@ -1,6 +1,6 @@
-package org.example.entity.builders;
+package org.example.common.entity.builders;
 
-import org.example.entity.Coordinates;
+import org.example.common.entity.Coordinates;
 import org.example.utils.InputReader;
 import org.example.utils.Printable;
 

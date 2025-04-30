@@ -1,156 +1,131 @@
 package org.example.common.managers;
 
-import lombok.Getter;
-import org.example.entity.Product;
-import org.example.utils.exceptions.ValidationError;
-
+import org.example.common.entity.Product;
+import org.example.common.id.AutoIdGenerator;
 import java.util.*;
+import java.util.stream.Collectors;
 
-@Getter
+
+/**
+ * Менеджер коллекции продуктов.
+ * Все операции над коллекцией реализованы через Stream API.
+ */
 public class CollectionManager {
-    /**
-     * Коллекция объектов
-     */
-    @Getter
-    private static HashMap<String, Product> collection = new HashMap<>();
+    private final List<Product> products = new ArrayList<>();
+    private final AutoIdGenerator idGen;
 
     /**
-     * Время инициализации коллекции
-     * Время инициализации объекта CollectionManager
+     * @param initial начальный список (например, загруженный из файла)
+     * @param idGen   генератор уникальных ID
      */
-    private final Date initDate = new Date();
-
-    /**
-     * Метод присваивает коллекции передаваемое значение, если элементы коллекции корректны
-     * @param collection новая коллекция
-     * @return true если успешно, false если не прошла валидация одного из элементов
-     */
-    public static boolean setCollection(HashMap<String, Product> collection) {
-        if (!CollectionManager.allIdsAreUnique(collection)) {
-            return false;
+    public CollectionManager(List<Product> initial, AutoIdGenerator idGen) {
+        if (initial != null) {
+            // копируем, чтобы не захардкодить внешний список
+            products.addAll(initial);
         }
+        this.idGen = idGen;
+    }
 
-        for (Product p : collection.values()) {
-            if (!p.validate()) {
-                return false;
-            }
+    /** Возвращает все продукты, отсортированные по возрастанию id. */
+    public List<Product> getAllSortedById() {
+        return products.stream()
+                .sorted(Comparator.comparingLong(Product::getId))
+                .collect(Collectors.toList());
+    }
+
+    /** Команда show: возвращает строку со всеми продуктами. */
+    public String show() {
+        return getAllSortedById().stream()
+                .map(Product::toString)
+                .collect(Collectors.joining("\n"));
+    }
+
+    /** Команда info: возвращает тип коллекции, её размер и дату инициализации. */
+    public String info() {
+        return String.format("Тип: %s, размер: %d",
+                products.getClass().getSimpleName(),
+                products.size());
+    }
+
+    /** Вставляет новый продукт, присваивая ему уникальный ID. */
+    public void insert(Product p) {
+        long newId = idGen.nextId();
+        p.setId(newId);
+        products.add(p);
+    }
+
+    /** Удаляет продукт по ID. Возвращает true, если удаление произошло. */
+    public boolean removeById(long id) {
+        return products.removeIf(prod -> prod.getId() == id);
+    }
+
+    /** Обновляет продукт с данным ID. Возвращает true, если найден и обновлён. */
+    public boolean update(long id, Product newProduct) {
+        Optional<Product> existing = products.stream()
+                .filter(prod -> prod.getId() == id)
+                .findFirst();
+        if (existing.isPresent()) {
+            Product old = existing.get();
+            newProduct.setId(id);
+            products.set(products.indexOf(old), newProduct);
+            return true;
         }
-        CollectionManager.collection = collection;
-        return true;
+        return false;
+    }
+
+    /** Очищает коллекцию. */
+    public void clear() {
+        products.clear();
     }
 
     /**
-     * Статический метод для генерации нового id
-     * @return минимальный несуществующий id
+     * Добавляет продукт, если его значение (например, price) больше всех остальных.
+     * Возвращает true, если добавление произошло.
      */
-    public static long generateFreeId() {
-        if (collection.isEmpty()) return 1;
-
-        HashSet<Long> existIds = new HashSet<>();
-        for (Product product : collection.values()) {
-            existIds.add(product.getId());
+    public boolean addIfMax(Product p) {
+        Optional<Product> max = products.stream()
+                .max(Comparator.comparingDouble(Product::getPrice));
+        double maxPrice = max.map(Product::getPrice).orElse((long) Double.MIN_VALUE);
+        if (p.getPrice() > maxPrice) {
+            insert(p);
+            return true;
         }
-
-        for (long i = 1; i < Collections.max(existIds); i++) {
-            if (!existIds.contains(i)) return i;
-        }
-        return Collections.max(existIds) + 1;
+        return false;
     }
 
     /**
-     * Получение типа коллекции
-     * @return класс объекта коллекции
+     * Удаляет все продукты, которые "больше" заданного (по price).
+     * Возвращает количество удалённых элементов.
      */
-    public String getTypeOfCollection() {
-        return collection.getClass().getName();
+    public long removeGreater(Product p) {
+        long before = products.size();
+        products.removeIf(prod -> prod.getPrice() > p.getPrice());
+        return before - products.size();
     }
 
     /**
-     * Возвращает размер коллекции
-     * @return число элементов в коллекции
+     * Возвращает список продуктов с price меньше заданного.
+     * Список также отсортирован по ID.
      */
-    public int getCollectionSize() {
-        return collection.size();
+    public List<Product> filterLessThanPrice(double price) {
+        return products.stream()
+                .filter(prod -> prod.getPrice() < price)
+                .sorted(Comparator.comparingLong(Product::getId))
+                .collect(Collectors.toList());
     }
 
-    /**
-     * Находит объект в коллекции по его id
-     * @param id айди.
-     * @return Объект из коллекции или null, если его не существует
-     */
-    public Product getElementById(Long id) {
-        for (Product product : collection.values()) {
-            if (Objects.equals(product.getId(), id)) return product;
-        }
-        return null;
+    /** Считает, сколько продуктов имеют price больше заданного. */
+    public long countGreaterThanPrice(double price) {
+        return products.stream()
+                .filter(prod -> prod.getPrice() > price)
+                .count();
     }
 
-    /**
-     * Метод для валидации ключа хэшмапа
-     * @param key ключ
-     * @return OK => true, !OK => false
-     */
-    public static boolean validateKey(String key) {
-        return !key.isBlank();
-    }
-
-    /**
-     * Добавляет элемент в коллекцию предварительно проведя контрольную валидацию
-     * @param product новый элемент
-     * @throws ValidationError в случае неудачного прохождения валидации
-     */
-    public void insertElement(String key, Product product) throws ValidationError, IllegalArgumentException {
-        if (!validateKey(key)) throw new IllegalArgumentException("Ключ не может быть пустым");
-        if (!product.validate()) {
-            throw new ValidationError(product);
-        }
-        collection.put(key, product);
-    }
-
-    /**
-     * Очищает коллекцию
-     */
-    public void clearCollection() {
-        collection.clear();
-    }
-
-    /**
-     * Удаляет элемент из коллекции по его ключу
-     * @param key ключ
-     * @return true если элемент с таким ключом есть и удален, и false если элемент не найден
-     */
-    public boolean removeByKey(String key) {
-        return collection.remove(key) != null;
-    }
-
-    /**
-     * Проверка, являются ли все id в коллекции уникальными
-     * @param collection
-     * @return true если все id уникальны, false если есть повторения
-     */
-    public static boolean allIdsAreUnique(HashMap<String, Product> collection) {
-        HashSet<Long> ids = new HashSet<>();
-        for (Product p : collection.values()) {
-            if (ids.contains(p.getId())) return false;
-            ids.add(p.getId());
-        }
-        return true;
-    }
-
-    /**
-     * Удаление элемента по его id
-     * @param id id
-     * @return ключ по которому произошло изменение иначе null
-     */
-    public String removeById(long id) {
-        Iterator<Map.Entry<String, Product>> iterator = collection.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<String, Product> entry = iterator.next();
-            if (entry.getValue().getId() == id) {
-                iterator.remove();
-                return entry.getKey();
-            }
-        }
-        return null;
+    /** Возвращает список продуктов в порядке убывания price. */
+    public List<Product> sortDescendingByPrice() {
+        return products.stream()
+                .sorted(Comparator.comparingDouble(Product::getPrice).reversed())
+                .collect(Collectors.toList());
     }
 }
+

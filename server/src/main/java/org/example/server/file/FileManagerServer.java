@@ -4,7 +4,7 @@ package org.example.server.file;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.example.command.ConsoleOutput;
-import org.example.entity.Product;
+import org.example.common.entity.Product;
 
 import java.io.File;
 import java.io.IOException;

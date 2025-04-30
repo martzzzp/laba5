@@ -14,9 +14,9 @@ public class ConnectionAcceptor {
 
     public ConnectionAcceptor(int port, Selector selector) throws IOException {
         this.selector = selector;
-        this.serverChannel = ServerSocketChannel.open();
-        serverChannel.bind(new InetSocketAddress(port));
+        serverChannel = ServerSocketChannel.open();
         serverChannel.configureBlocking(false);
+        serverChannel.bind(new InetSocketAddress(port));
     }
 
     /** Регистрирует серверный канал для приёма OP_ACCEPT */
@@ -27,9 +27,7 @@ public class ConnectionAcceptor {
     /** При наступлении OP_ACCEPT принимает клиента и регистрирует его для OP_READ */
     public void acceptConnections() throws IOException {
         SocketChannel client = serverChannel.accept();
-        if (client != null) {
-            client.configureBlocking(false);
-            client.register(selector, SelectionKey.OP_READ);
-        }
+        client.configureBlocking(false);
+        client.register(selector, SelectionKey.OP_READ); // регистрируем клиентский канал на чтение
     }
 }

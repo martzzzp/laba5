@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Генерация уникальных ID для новых объектов.
  */
-public class AutoIdGenerator {
+public class AutoIdGenerator extends org.example.common.id.AutoIdGenerator {
     private final AtomicLong counter = new AtomicLong(1);
 
     /** Следующий ID */

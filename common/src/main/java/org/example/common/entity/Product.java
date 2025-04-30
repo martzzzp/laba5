@@ -1,8 +1,7 @@
-package org.example.entity;
+package org.example.common.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.example.common.managers.CollectionManager;
 import org.example.utils.Validatable;
 
 import java.text.SimpleDateFormat;
@@ -47,8 +46,7 @@ public class Product implements Validatable, Comparable<Product> {
         this.manufactureCost = manufactureCost;
         this.unitOfMeasure = unitOfMeasure;
         this.owner = owner;
-
-        this.id = CollectionManager.generateFreeId();
+        // id будет проставлен CollectionManager при insert(...)
         this.creationDate = new Date();
     }
 

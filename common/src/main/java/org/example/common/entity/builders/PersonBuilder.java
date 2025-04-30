@@ -1,9 +1,9 @@
-package org.example.entity.builders;
+package org.example.common.entity.builders;
 
-import org.example.entity.Country;
-import org.example.entity.EyeColor;
-import org.example.entity.HairColor;
-import org.example.entity.Person;
+import org.example.common.entity.Country;
+import org.example.common.entity.EyeColor;
+import org.example.common.entity.HairColor;
+import org.example.common.entity.Person;
 import org.example.utils.InputReader;
 import org.example.utils.Printable;
 

@@ -1,9 +1,9 @@
-package org.example.entity.builders;
+package org.example.common.entity.builders;
 
-import org.example.entity.Coordinates;
-import org.example.entity.Person;
-import org.example.entity.Product;
-import org.example.entity.UnitOfMeasure;
+import org.example.common.entity.Coordinates;
+import org.example.common.entity.Person;
+import org.example.common.entity.Product;
+import org.example.common.entity.UnitOfMeasure;
 import org.example.utils.InputReader;
 import org.example.utils.Printable;
 

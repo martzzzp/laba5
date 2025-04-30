@@ -1,11 +1,11 @@
 package org.example.server;
 
-import org.example.common.managers.CollectionManager;
+import org.example.command.commands.*;
 import org.example.common.managers.CommandManager;
-import org.example.common.protocol.Request;
+import org.example.common.managers.CollectionManager;
 import org.example.common.protocol.Response;
 import org.example.command.ConsoleOutput;
-import org.example.entity.Product;
+import org.example.common.entity.Product;
 import org.example.server.connection.ConnectionAcceptor;
 import org.example.server.file.FileManagerServer;
 import org.example.server.id.AutoIdGenerator;
@@ -13,11 +13,11 @@ import org.example.server.processor.CommandProcessor;
 import org.example.server.reader.RequestReader;
 import org.example.server.sender.ResponseSender;
 
+import java.util.Arrays;
 import java.io.File;
 import java.io.IOException;
 import java.nio.channels.Selector;
 import java.nio.channels.SelectionKey;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ServerMain {
@@ -42,21 +42,32 @@ public class ServerMain {
         idGen.synchronizeWithExisting(maxId);
 
         // 3) Менеджеры
-        //CollectionManager collectionManager = new CollectionManager(products, idGen);
+        CollectionManager collectionManager = new CollectionManager(products, idGen);
         CommandManager   commandManager    = new CommandManager();
-        // TODO: зарегистрируйте ваши команды, например:
-        // commandManager.addCommands(Arrays.asList(
-        //     new HelpCommand(commandManager, consoleOutput),
-        //     new InsertCommand(consoleOutput, new ConsoleInput(), collectionManager),
-        //     …
-        // ));
+        // Регистрируем команды
+        commandManager.addCommands(Arrays.asList(
+                new HelpCommand(commandManager, consoleOutput),
+                new InfoCommand(collectionManager, consoleOutput),
+                new ShowCommand(collectionManager, consoleOutput),
+                new InsertCommand(collectionManager, consoleOutput),
+                new RemoveByIdCommand(collectionManager, consoleOutput),
+                new UpdateCommand(collectionManager, consoleOutput),
+                new ClearCommand(collectionManager, consoleOutput),
+                new AddIfMaxCommand(collectionManager, consoleOutput),
+                new RemoveGreaterCommand(collectionManager, consoleOutput),
+                new FilterLessThanPriceCommand(collectionManager, consoleOutput),
+                new CountGreaterThanPriceCommand(collectionManager, consoleOutput)));
 
-        // 4) NIO‑модули
-        try {
-            Selector selector = Selector.open();
+        // Подавим Ctrl+C и сохраним коллекцию при shutdown
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            fileManager.saveCollection(products);
+            consoleOutput.println("Collection saved on shutdown.");
+        }));
+
+        // 4) NIO‑модули и основной цикл
+        try (Selector selector = Selector.open()) {
             ConnectionAcceptor acceptor = new ConnectionAcceptor(port, selector);
             acceptor.register();
-
             // сюда возвращаем processor и reader/sender
             RequestReader    reader    = new RequestReader();
             CommandProcessor processor = new CommandProcessor(commandManager);
